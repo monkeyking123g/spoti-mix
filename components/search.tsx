@@ -11,7 +11,7 @@ import {
 import { Input } from "@nextui-org/input";
 import { SearchIcon } from "./icons";
 import { getToken, getSearch, SpotifyTrack } from "@/api";
-import Track from "./track";
+import Track from "./searchTrack";
 
 export default function Search() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -81,13 +81,15 @@ export default function Search() {
               </ModalHeader>
               <ModalBody>
                 {searchValue &&
-                  searchValue.slice(0, 5).map((track, index) => {
-                    return (
-                      <p>
-                        <Track key={index} data={track} />
-                      </p>
-                    );
-                  })}
+                  searchValue
+                    .slice(0, 5)
+                    .map((track: SpotifyTrack, index: number) => {
+                      return (
+                        <p>
+                          <Track key={index} data={track} />
+                        </p>
+                      );
+                    })}
               </ModalBody>
             </>
           )}
