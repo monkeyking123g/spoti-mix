@@ -67,11 +67,17 @@ export interface SpotifyTrack {
   uri: string;
 }
 
-interface GenreCategory {
-  // Definisci le proprietà della categoria qui, ad esempio:
-  // id: string;
-  // name: string;
-  // ...
+export interface Genre {
+  href: string;
+  icons: Icon[];
+  id: string;
+  name: string;
+}
+
+interface Icon {
+  height: number;
+  url: string;
+  width: number;
 }
 
 interface Playlist {
@@ -116,7 +122,7 @@ export const getTracks = async (
   return data.items;
 };
 
-export const getGenres = async (token: string): Promise<GenreCategory[]> => {
+export const getGenres = async (token: string): Promise<Genre[]> => {
   const result = await fetch(
     `https://api.spotify.com/v1/browse/categories?locale=sv_US`,
     {
@@ -125,7 +131,7 @@ export const getGenres = async (token: string): Promise<GenreCategory[]> => {
     }
   );
 
-  const data: { categories: { items: GenreCategory[] } } = await result.json();
+  const data: { categories: { items: Genre[] } } = await result.json();
   return data.categories.items;
 };
 

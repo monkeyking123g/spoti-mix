@@ -2,7 +2,8 @@
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
-export default function AboutPage() {
+
+export default function TrackPage() {
   const tracks = [1, 2, 4, 5, 5, 6, 1, 2, 4, 5, 5, 6];
   return tracks.map(() => {
     return (
