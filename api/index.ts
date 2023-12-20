@@ -80,11 +80,45 @@ interface Icon {
   width: number;
 }
 
-interface Playlist {
-  // Definisci le proprietà della playlist qui, ad esempio:
-  // id: string;
-  // name: string;
-  // ...
+interface ExternalUrls {
+  spotify: string;
+}
+
+interface Image {
+  height: number;
+  url: string;
+  width: number;
+}
+
+interface Owner {
+  display_name: string;
+  external_urls: ExternalUrls;
+  href: string;
+  id: string;
+  type: string;
+  uri: string;
+}
+
+interface Tracks {
+  href: string;
+  total: number;
+}
+
+export interface Playlist {
+  collaborative: boolean;
+  description: string;
+  external_urls: ExternalUrls;
+  href: string;
+  id: string;
+  images: Image[];
+  name: string;
+  owner: Owner;
+  primary_color: string | null;
+  public: boolean | null;
+  snapshot_id: string;
+  tracks: Tracks;
+  type: string;
+  uri: string;
 }
 
 export interface SearchTracks {
@@ -109,7 +143,7 @@ export const getToken = async (): Promise<string> => {
 
 export const getTracks = async (
   token: string,
-  tracksEndPoint: string
+  tracksEndPoint: string,
 ): Promise<SpotifyTrack[]> => {
   const limit = 20;
 
@@ -128,7 +162,7 @@ export const getGenres = async (token: string): Promise<Genre[]> => {
     {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   const data: { categories: { items: Genre[] } } = await result.json();
@@ -137,7 +171,7 @@ export const getGenres = async (token: string): Promise<Genre[]> => {
 
 export const getPlaylistByGenre = async (
   token: string,
-  genreId: string
+  genreId: string,
 ): Promise<Playlist[]> => {
   const limit = 10;
 
@@ -146,7 +180,7 @@ export const getPlaylistByGenre = async (
     {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   const data: { playlists: { items: Playlist[] } } = await result.json();
@@ -156,14 +190,14 @@ export const getPlaylistByGenre = async (
 export const getSearch = async (
   token: string,
   searchInput: string,
-  type: string
+  type: string,
 ): Promise<SearchTracks> => {
   const result = await fetch(
     `https://api.spotify.com/v1/search?q=${searchInput}&type=${type}`,
     {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
   const data = await result.json();
   return data;
