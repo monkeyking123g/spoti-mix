@@ -1,162 +1,191 @@
 "use client";
 import "@/styles/player.css";
+import React, { Component, RefObject } from 'react';
+import { RootState } from "@/redux/store";
 import {Card } from "@nextui-org/card";
-import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { play, pause, setVolume, setDuration, setCurrentTime } from '../app/GlobalRedux/slices/playerSlice';
+import { play } from '@/redux/slices/playerSlice';
 import { PlayIcon, PauseIcon, VolumeIcon } from "./icons";
-import { RootState } from "@/app/GlobalRedux/store";
+interface AudioVisualizerProps {
+  tracks: string[]
+  currentTrackIndex: number;
+  isPlaying: boolean;
+  dispatch: any;
+}
 
-const Player = () => {
-  const dispatch = useDispatch();
-  const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
-  const volume = useSelector((state: RootState) => state.player.volume);
-  const tracks = useSelector((state: RootState) => state.player.tracks);
-  const duration = useSelector((state: RootState) => state.player.duration);
-  const currentTime = useSelector((state: RootState) => state.player.currentTime);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const WIDTH = 480; 
-  const HEIGHT = 50;
+interface AudioVisualizerState {
+    isReplay: boolean;
+    currentTime: number;
+}
 
-  const handlePlay = () => {
-    if(isPlaying) return dispatch(pause())
-    
-    return dispatch(play())
-    
-  } 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = Number(e.target.value);
-    dispatch(setVolume(newVolume));
-    if (audioElement) {
-      audioElement.volume = newVolume / 100;
+class AudioVisualizer extends Component<AudioVisualizerProps, AudioVisualizerState> {
+    private audioElementRef: RefObject<HTMLAudioElement>;
+    private canvasElementRef: RefObject<HTMLCanvasElement>;
+    private playPauseButtonRef: RefObject<HTMLButtonElement>;
+    private seekbarRef: RefObject<HTMLInputElement>;
+    private volumeBarRef: RefObject<HTMLInputElement>;
+    private canvasCtx: CanvasRenderingContext2D | null = null;
+    private analyser: AnalyserNode | null = null;
+    private dataArray: Uint8Array | null = null;
+    private WIDTH: number = 0;
+    private HEIGHT: number = 0;
+    private audioCtx: AudioContext;
+
+    constructor(props: AudioVisualizerProps | Readonly<AudioVisualizerProps>) {
+        super(props);
+        this.audioElementRef = React.createRef();
+        this.canvasElementRef = React.createRef();
+        this.playPauseButtonRef = React.createRef();
+        this.seekbarRef = React.createRef();
+        this.volumeBarRef = React.createRef();
+        this.canvasCtx = null;
+        this.state = {
+            isReplay: false,
+            currentTime: 0
+        };
+        this.analyser = null;
+        this.dataArray = null;
+        this.WIDTH = 480;
+        this.HEIGHT = 50;
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-  };
 
-  const handleCurrentTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = Number(e.target.value);
-    dispatch(setCurrentTime(newTime));
-    if (audioElement) {
-      audioElement.currentTime = newTime;
+      componentDidUpdate(prevProps: { isPlaying: boolean; tracks: string[] }) {
+        if (prevProps.isPlaying !== this.props.isPlaying) {
+            this.togglePlayPause();
+        }
+        if (prevProps.tracks !== this.props.tracks) {
+          this.togglePlayPause();
+      }
     }
-  };
 
-  // const handleLoadTracks = (trackList: string[]) => {
-  //   dispatch(loadTracks(trackList));
-  // };
+    componentDidMount() {
+        if(this.canvasElementRef && this.audioElementRef) {
+          this.WIDTH = this.canvasElementRef.current.clientWidth;
+          this.HEIGHT = this.canvasElementRef.current.clientHeight;
+          this.canvasCtx = this.canvasElementRef.current.getContext('2d');
 
-  // const handleLoadTrack = (trackUrl: string) => {
-  //   dispatch(loadTrack(trackUrl));
-  // };
+          const audioElement = this.audioElementRef.current;
+          const source = this.audioCtx.createMediaElementSource(audioElement);
+          this.analyser = this.audioCtx.createAnalyser();
+          this.analyser.fftSize = 256;
+          source.connect(this.analyser);
+          this.analyser.connect(this.audioCtx.destination);
   
-
-  useEffect(() => {
-    // if (tracks.length === 0) return;
-
-    const canvas: HTMLCanvasElement | any  = document.getElementById("audioCanvas");
-    const canvasCtx = canvas.getContext("2d");
-
-    const audioContext = new (window.AudioContext ||
-      window.AudioContext)();
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const audio: HTMLAudioElement = new Audio('https://cdn.pixabay.com/audio/2023/10/03/audio_ff0e1ce26c.mp3');
-    audio.currentTime = currentTime;
-    audio.volume = volume / 100;
-    audio.addEventListener("loadedmetadata", () => {
-      dispatch(setDuration(audio.duration)); 
-    });
-
-    audio.addEventListener("timeupdate", () => {
-      dispatch(setCurrentTime(audio.currentTime));
-    });
-
-    audio.addEventListener("ended", () => {
-      if (currentTrackIndex < tracks.length - 1) {
-        setCurrentTrackIndex(currentTrackIndex + 1);
-        audio.src = tracks[currentTrackIndex + 1];
-        audio.load();
-        audio.play();
-      }
-    });
-
-    audio.crossOrigin = "anonymous";
-    const source = audioContext.createMediaElementSource(audio);
-
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    function draw() {
-      analyser.getByteFrequencyData(dataArray);
-      canvasCtx.fillStyle = "rgb(2, 2, 2)";
-      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-      const barWidth = (WIDTH / bufferLength) * 2.5;
-      let barHeight;
-      let x = 0;
-
-      for (let i = 0; i < bufferLength; i++) {
-        barHeight = dataArray[i] / 2.8;
-        canvasCtx.fillStyle = `rgba(0, 136, 169, 1)`;
-        canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-
-        x += barWidth + 1;
-      }
-
-      requestAnimationFrame(draw);
-    }
-    if (isPlaying) {
-      audio.play();
-      draw();
+          const bufferLength = this.analyser.frequencyBinCount;
+          this.dataArray = new Uint8Array(bufferLength);
+          setInterval(this.setProgress, 500);
+          this.draw();
+        }
+        
     }
 
-    setAudioElement(audio);
+    draw() {
+        const canvasCtx = this.canvasCtx;
+        const WIDTH = this.WIDTH;
+        const HEIGHT = this.HEIGHT;
+        const analyser = this.analyser;
+        const dataArray = this.dataArray;
+        if(!analyser || !canvasCtx || !dataArray ) return 
+        analyser.getByteFrequencyData(dataArray);
+        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+  
+        const barWidth = (WIDTH / dataArray.length) * 2.5;
+        let barHeight;
+        let x = 0;
 
-    return () => {
-      audio.pause();
-    };
-  }, [isPlaying]);
+        for (let i = 0; i < dataArray.length; i++) {
+            barHeight = dataArray[i] / 2.8;
+            canvasCtx.fillStyle = `rgba(0, 136, 169, 1)`;
+            canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
 
-  return (
-    <Card
-      isBlurred
-      className="border-none bg-background/60 dark:bg-default-100/50 max-w-[480px] max-h-[200px]"
-      shadow="sm"
-    >
-      <div>
-	  	<canvas width={WIDTH} height={HEIGHT} id="audioCanvas"></canvas>
-      </div>
-      <div>
-        <div className="flex justify-center items-center rounded-lg shadow-lg p-1">
-        <button onClick={handlePlay}>
-			      {isPlaying ? <PlayIcon /> : <PauseIcon />}
-        </button>
-        <input
-          className="appearance-none w-300 bg-default-500/30 seekbar"
-          type="range"
-          min="0"
-          max={duration}
-          value={currentTime.toString()}
-          onChange={handleCurrentTimeChange}
-        />
-        <VolumeIcon />
-        <input
-          className="appearance-none w-300 bg-default-500/30 volume"
-          type="range"
-          min="0"
-          max="100"
-          value={volume}
-          onChange={handleVolumeChange}
-        />
-        </div>
-      </div>
-    </Card>
-  );
-};
+        requestAnimationFrame(() => this.draw());
+    }
 
-export default Player;
+    togglePlayPause = () => {
+      this.audioCtx.resume().then(() => {
+        if (this.props.isPlaying) {
+          console.log('Play')
+          this.audioElementRef.current.play();
+        } else {
+          console.log('Pause')
+          this.audioElementRef.current.pause();
+          
+      }
+      })
+    }
+    setProgress = () => {
+      if (this.audioElementRef.current) {
+          const currentTime = this.audioElementRef.current.currentTime;
+          this.setState({ currentTime });
+          this.seekbarRef.current!.value = String(currentTime);
+      }
+  }
 
+  setDuration = () => {
+      if (this.audioElementRef.current) {
+          this.seekbarRef.current!.max = String(this.audioElementRef.current.duration);
+      }
+  }
+
+  onEnd = () => {
+      this.audioElementRef.current!.currentTime = 0;
+      this.seekbarRef.current!.value = '0';
+  }
+
+  onSeek = (evt: React.ChangeEvent<HTMLInputElement>) => {
+      if (this.audioElementRef.current) {
+          this.audioElementRef.current.currentTime = parseFloat(evt.target.value);
+      }
+  }
+
+  onVolumeSeek = (evt: React.ChangeEvent<HTMLInputElement>) => {
+      if (this.audioElementRef.current) {
+          this.audioElementRef.current.volume = parseFloat(evt.target.value) / 100;
+      }
+  }
+
+
+    render() {
+      const { tracks, currentTrackIndex, isPlaying } = this.props;
+        return (
+            <div>
+                <audio src={tracks[currentTrackIndex]}  ref={this.audioElementRef} crossOrigin="anonymous"></audio>
+                <Card
+                  isBlurred
+                  className="border-none bg-background/60 dark:bg-default-100/50 max-w-[480px] max-h-[200px]"
+                  shadow="sm"
+                >
+                  <div>
+                  <canvas className="bg-background/60" ref={this.canvasElementRef} width={this.WIDTH} height={this.HEIGHT}></canvas>
+                  </div>
+                  <div>
+                    <div className="flex justify-center items-center rounded-lg shadow-lg p-1">
+                    <button ref={this.playPauseButtonRef} onClick={() => {
+                      this.props.dispatch(play())
+                    }}>{
+                      isPlaying ? <PauseIcon /> : <PlayIcon />
+                    }</button>
+                     <input  className="appearance-none w-300 bg-default-500/30 seekbar" ref={this.seekbarRef}  onChange={this.onSeek}  type="range"  />
+                    <VolumeIcon />
+                      <input className="appearance-none w-300 bg-default-500/30 volume" ref={this.volumeBarRef}  onChange={this.onVolumeSeek} type="range" />
+                    </div>
+                  </div>
+                </Card>
+            </div>
+        );
+    }
+}
+
+const AudioVisualizerWrapper: React.FC = () => {
+  const tracks = useSelector((state: RootState) => state.player.tracks);
+  const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
+  const dispatch = useDispatch()
+  const currentTrackIndex = useSelector((state: RootState) => state.player.currentTrackIndex);
+  return <AudioVisualizer tracks={tracks} currentTrackIndex={currentTrackIndex} isPlaying={isPlaying} dispatch={dispatch} />;
+}
+
+export default AudioVisualizerWrapper;

@@ -9,10 +9,6 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Albub",
-      href: "/album",
-    },
-    {
       label: "Tracks",
       href: "/tracks",
     },
@@ -27,36 +23,20 @@ export const siteConfig = {
   ],
   navMenuItems: [
     {
-      label: "Profile",
-      href: "/profile",
+      label: "Home",
+      href: "/",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "Tracks",
+      href: "/tracks",
     },
     {
-      label: "Projects",
-      href: "/projects",
+      label: "Genere",
+      href: "/genre",
     },
     {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
+      label: "Playlist",
+      href: "/playlist",
     },
   ],
   links: {

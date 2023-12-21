@@ -47,5 +47,9 @@
     "tailwind-variants": "^0.1.13",
     "tailwindcss": "3.3.3",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "@types/raf": "^3.4.3",
+    "@types/react-howler": "^5.2.3"
   }
 }

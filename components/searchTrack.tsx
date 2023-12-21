@@ -4,9 +4,12 @@ import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
 import { PauseIcon, PlayIcon } from "./icons";
 import { Chip } from "@nextui-org/chip";
-export default function Track(data: any) {
-  const [isPlay, setIsPlay] = React.useState(false);
+import { loadTracks } from '@/redux/slices/playerSlice';
+import { useDispatch } from "react-redux";
+import { SpotifyTrack } from "@/api";
 
+export default function Track(data: {data: SpotifyTrack}) {
+  const dispatch = useDispatch()
   return (
     <Card
       isBlurred
@@ -39,9 +42,13 @@ export default function Track(data: any) {
               className="text-default-900/60 data-[hover]:bg-foreground/10 -translate-y-2 translate-x-2 p-1"
               radius="full"
               variant="light"
-              onPress={() => setIsPlay((v: boolean) => !v)}
+              onPress={() => {
+                if(data.data.preview_url) {
+                  dispatch(loadTracks([data.data.preview_url]))
+                }
+              }}
             >
-              {isPlay ? <PauseIcon /> : <PlayIcon />}
+             {data.data.preview_url ? 'play' : 'no preview' }
             </Button>
           </div>
         </div>

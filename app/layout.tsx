@@ -1,13 +1,12 @@
+"use client";
 import "@/styles/globals.css";
 import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
-import { Link } from "@nextui-org/link";
-import Player from "@/components/player";
+import AudioPlayer from "@/components/player";
 import clsx from "clsx";
-
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -46,7 +45,7 @@ export default function RootLayout({
               {children}
             </main>
             <footer className="sticky bottom-0 z-40 w-full flex items-center justify-center py-2">
-              <Player />
+              <AudioPlayer />
             </footer>
           </div>
         </Providers>

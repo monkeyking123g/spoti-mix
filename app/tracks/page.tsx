@@ -4,20 +4,18 @@ import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import {
-  getGenres,
   getToken,
-  Genre,
-  getPlaylistByGenre,
-  Playlist,
   getTracks,
 } from "@/api";
+import { loadTracks } from '@/redux/slices/playerSlice';
+import { useDispatch } from "react-redux";
 
 const PHONK_LIST =
   "https://api.spotify.com/v1/playlists/37i9dQZF1DWWY64wDtewQt/tracks/";
 
 export default function TrackPage() {
-  const [tracks, setTracks] = useState([]);
-
+  const [tracks, setTracks] = useState<any>([]);
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
       const token = await getToken();
@@ -28,7 +26,8 @@ export default function TrackPage() {
     };
     fetchData();
   }, []);
-  return tracks.map((data) => {
+
+  return tracks.map((data: any) => {
     return (
       <Card key={data.track.id} className="py-4">
         <CardHeader className="overflow-visible py-2">
@@ -44,6 +43,11 @@ export default function TrackPage() {
         </CardBody>
         <CardFooter className="flex justify-between">
           <Button
+            onClick={() => {
+              if(data.track.preview_url) {
+                dispatch(loadTracks([data.track.preview_url]))
+              }
+            }}
             className=" text-tiny text-white bg-black/20"
             variant="flat"
             color="default"
