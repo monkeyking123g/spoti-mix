@@ -2,14 +2,12 @@ import React from "react";
 import { Card, CardBody } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
-import { PauseIcon, PlayIcon } from "./icons";
-import { Chip } from "@nextui-org/chip";
-import { loadTracks } from '@/redux/slices/playerSlice';
+import { loadTracks } from "@/redux/slices/playerSlice";
 import { useDispatch } from "react-redux";
-import { SpotifyTrack } from "@/api";
+import { Track } from "@/api/types";
 
-export default function Track(data: {data: SpotifyTrack}) {
-  const dispatch = useDispatch()
+export default function Track(data: { data: Track }) {
+  const dispatch = useDispatch();
   return (
     <Card
       isBlurred
@@ -34,21 +32,19 @@ export default function Track(data: {data: SpotifyTrack}) {
             <h3 className="font-semibold text-foreground/90">
               {data.data.name}
             </h3>
-            <Chip color="primary">{data.data.album.artists[0].name}</Chip>
+            <p>{data.data.album.artists[0].name}</p>
           </div>
           <div className="flex items-center justify-center">
             <Button
-              isIconOnly
-              className="text-default-900/60 data-[hover]:bg-foreground/10 -translate-y-2 translate-x-2 p-1"
-              radius="full"
-              variant="light"
+              variant="shadow"
+              color={data.data.preview_url ? "primary" : "danger"}
               onPress={() => {
-                if(data.data.preview_url) {
-                  dispatch(loadTracks([data.data.preview_url]))
+                if (data.data.preview_url) {
+                  dispatch(loadTracks([data.data.preview_url]));
                 }
               }}
             >
-             {data.data.preview_url ? 'play' : 'no preview' }
+              {data.data.preview_url ? "play" : "no preview"}
             </Button>
           </div>
         </div>

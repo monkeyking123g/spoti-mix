@@ -1,6 +1,6 @@
 import { title } from "@/components/primitives";
 
-export default function AboutLayout({
+export default function TrackLayout({
   children,
 }: {
   children: React.ReactNode;

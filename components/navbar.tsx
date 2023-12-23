@@ -22,7 +22,7 @@ import {
   SpotiMixLogo,
 } from "@/components/icons";
 
-import { Logo } from "@/components/icons";
+import "@/styles/navbar.css";
 
 export const Navbar = () => {
   const searchInput = (
@@ -33,7 +33,7 @@ export const Navbar = () => {
         input: "text-sm",
       }}
       endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
+        <Kbd className="hidden lg:inline-block" keys={["ctrl"]}>
           K
         </Kbd>
       }
@@ -58,7 +58,7 @@ export const Navbar = () => {
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium nav-link font-medium p-2"
                 )}
                 color="foreground"
                 href={item.href}
@@ -106,8 +106,8 @@ export const Navbar = () => {
                   index === 2
                     ? "primary"
                     : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                    ? "danger"
+                    : "foreground"
                 }
                 href="#"
                 size="lg"

@@ -13,12 +13,12 @@ export const siteConfig = {
       href: "/tracks",
     },
     {
-      label: "Genere",
-      href: "/genre",
-    },
-    {
       label: "Playlist",
       href: "/playlist",
+    },
+    {
+      label: "Genere",
+      href: "/genre",
     },
   ],
   navMenuItems: [
@@ -31,12 +31,12 @@ export const siteConfig = {
       href: "/tracks",
     },
     {
-      label: "Genere",
-      href: "/genre",
-    },
-    {
       label: "Playlist",
       href: "/playlist",
+    },
+    {
+      label: "Genere",
+      href: "/genre",
     },
   ],
   links: {

@@ -1,4 +1,4 @@
-export default function PricingLayout({
+export default function PlaylistLayout({
   children,
 }: {
   children: React.ReactNode;

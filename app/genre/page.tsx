@@ -2,24 +2,59 @@
 import { useEffect, useState } from "react";
 import { Card } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
-import { getGenres, getToken, Genre } from "@/api";
+import { Skeleton } from "@nextui-org/skeleton";
+import { getGenres, getToken } from "@/api";
+import { Genre } from "@/api/types";
+import { useRouter } from "next/navigation";
+import { Button } from "@nextui-org/button";
+
 export default function GenrePage() {
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [load, setLoad] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = await getToken();
-      const genres = await getGenres(token);
+      try {
+        const token = await getToken();
+        const fetchedGenres = await getGenres(token);
 
-      if (genres) {
-        setGenres(genres);
+        if (fetchedGenres) {
+          setGenres(fetchedGenres);
+        }
+      } catch (err) {
+        setError("Failed to fetch genres");
+      } finally {
+        setLoad(false);
       }
     };
     fetchData();
   }, []);
 
+  if (load) {
+    const skeletonArray = Array(8).fill(null);
+    return (
+      <>
+        {skeletonArray.map((_, index) => (
+          <GenreSkeleton key={index} />
+        ))}
+      </>
+    );
+  }
+
+  if (error) {
+    return <h2>Something went wrong!</h2>;
+  }
+
   return genres.map((genre) => (
-    <Card key={genre.id} className={`border-none`}>
+    <Card
+      isPressable
+      onPress={() => router.push(`/playlist/?genre=${genre.id}`)}
+      key={genre.id}
+      className={`border-none`}
+    >
       <Image
         alt={`Track ${genre.name}`}
         className="object-cover"
@@ -29,4 +64,14 @@ export default function GenrePage() {
       />
     </Card>
   ));
+}
+
+function GenreSkeleton() {
+  return (
+    <Card className="space-y-5 p-4" radius="lg">
+      <Skeleton className="rounded-lg  h-[275px]">
+        <div className="h-24 rounded-lg bg-default-300"></div>
+      </Skeleton>
+    </Card>
+  );
 }
