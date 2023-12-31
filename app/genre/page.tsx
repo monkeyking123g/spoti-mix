@@ -6,7 +6,6 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { getGenres, getToken } from "@/api";
 import { Genre } from "@/api/types";
 import { useRouter } from "next/navigation";
-import { Button } from "@nextui-org/button";
 
 export default function GenrePage() {
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -51,16 +50,17 @@ export default function GenrePage() {
   return genres.map((genre) => (
     <Card
       isPressable
-      onPress={() => router.push(`/playlist/?genre=${genre.id}`)}
+      onClick={() => router.push(`/playlist/${genre.id}`)}
       key={genre.id}
-      className={`border-none`}
+      className="border-none"
     >
       <Image
+        isZoomed
         alt={`Track ${genre.name}`}
         className="object-cover"
         height={genre.icons[0].height}
         src={genre.icons[0].url}
-        width="100%"
+        width={298}
       />
     </Card>
   ));

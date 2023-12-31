@@ -7,7 +7,7 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { Image } from "@nextui-org/image";
 import { getGenres, getToken, getPlaylistByGenre } from "@/api";
 import { Genre, Playlist } from "@/api/types";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function PlayList() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
@@ -16,7 +16,6 @@ export default function PlayList() {
   const [load, setLoad] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const skeletonArray = Array(8).fill(null);
-  const router = useSearchParams();
 
   const handleChangeTab = async (newTabId: string) => {
     setActiveTab(newTabId);
@@ -75,8 +74,17 @@ export default function PlayList() {
 }
 
 function PlaylistCard({ playlist }: { playlist: Playlist }) {
+  const router = useRouter();
   return (
-    <Card isFooterBlurred key={playlist.id} className="h-[400px]">
+    <Card
+      isFooterBlurred
+      key={playlist.id}
+      className="h-[400px]"
+      isPressable
+      onClick={() =>
+        router.push(`/playlist/tracks/?href=${playlist.tracks.href}`)
+      }
+    >
       <Image
         removeWrapper
         alt="Card background"
@@ -92,9 +100,9 @@ function PlaylistCard({ playlist }: { playlist: Playlist }) {
 
 function PlaylistSkeleton() {
   return (
-    <Card className="space-y-5 p-4" radius="lg">
-      <Skeleton className="rounded-lg  h-[360px]">
-        <div className="h-24 rounded-lg bg-default-300"></div>
+    <Card className="space-y-5" radius="lg">
+      <Skeleton className="rounded-lg  h-[360px] w-[100%]">
+        <div className="h-24 rounded-lg "></div>
       </Skeleton>
     </Card>
   );

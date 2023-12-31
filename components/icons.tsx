@@ -1,27 +1,27 @@
 import * as React from "react";
 import { IconSvgProps } from "@/types";
 import "../styles/icons.css";
-export const Logo: React.FC<IconSvgProps> = ({
-  size = 36,
-  width,
-  height,
-  ...props
-}) => (
-  <svg
-    fill="none"
-    height={size || height}
-    viewBox="0 0 32 32"
-    width={size || width}
-    {...props}
-  >
-    <path
-      clipRule="evenodd"
-      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-      fill="currentColor"
-      fillRule="evenodd"
-    />
-  </svg>
-);
+// export const Logo: React.FC<IconSvgProps> = ({
+//   size = 36,
+//   width,
+//   height,
+//   ...props
+// }) => (
+//   <svg
+//     fill="none"
+//     height={size || height}
+//     viewBox="0 0 32 32"
+//     width={size || width}
+//     {...props}
+//   >
+//     <path
+//       clipRule="evenodd"
+//       d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
+//       fill="currentColor"
+//       fillRule="evenodd"
+//     />
+//   </svg>
+// );
 
 export const TwitterIcon: React.FC<IconSvgProps> = ({
   size = 24,
@@ -169,15 +169,19 @@ export const SpotiMixLogo: React.FC<IconSvgProps> = (props) => {
 
   return (
     <svg
-      fill="#1DB954"
+      fill="#7e5bef"
       height={height}
       viewBox="0 0 24 24"
       width={width}
       xmlns="http://www.w3.org/2000/svg"
-      className="fill-animation" // Apply the 'fill-animation' class for the fill animation
+      className="fill-animation"
       {...props}
     >
       <defs>
+        <linearGradient id="gradientId" gradientTransform="rotate(90)">
+          <stop offset="0%" stopColor="#ff1cf7" />
+          <stop offset="100%" stopColor="#b249f8" />
+        </linearGradient>
         <mask id="spotiMixMask" x="0" y="0" width="100%" height="100%">
           <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
           <path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#000" />

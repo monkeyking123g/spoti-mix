@@ -6,11 +6,13 @@ import { Card } from "@nextui-org/card";
 import { useDispatch, useSelector } from "react-redux";
 import { play } from "@/redux/slices/playerSlice";
 import { PlayIcon, PauseIcon, VolumeIcon } from "./icons";
+import { useTheme } from "next-themes";
 interface AudioVisualizerProps {
   tracks: string[];
   currentTrackIndex: number;
   isPlaying: boolean;
   dispatch: any;
+  theme: string;
 }
 
 interface AudioVisualizerState {
@@ -50,7 +52,7 @@ class AudioVisualizer extends Component<
     this.dataArray = null;
     this.WIDTH = 480;
     this.HEIGHT = 50;
-    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    this.audioCtx = new window.AudioContext();
   }
 
   componentDidUpdate(prevProps: { isPlaying: boolean; tracks: string[] }) {
@@ -88,10 +90,15 @@ class AudioVisualizer extends Component<
     const HEIGHT = this.HEIGHT;
     const analyser = this.analyser;
     const dataArray = this.dataArray;
+
     if (!analyser || !canvasCtx || !dataArray) return;
     analyser.getByteFrequencyData(dataArray);
-    canvasCtx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    canvasCtx.fillStyle = this.props.theme === "light" ? "#000000" : "#171717";
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    const gradient = canvasCtx.createLinearGradient(0, 0, 0, HEIGHT);
+    gradient.addColorStop(0, "#ff1cf7");
+    gradient.addColorStop(1, "#b249f8");
 
     const barWidth = (WIDTH / dataArray.length) * 2.5;
     let barHeight;
@@ -99,7 +106,7 @@ class AudioVisualizer extends Component<
 
     for (let i = 0; i < dataArray.length; i++) {
       barHeight = dataArray[i] / 2.8;
-      canvasCtx.fillStyle = `rgba(0, 136, 169, 1)`;
+      canvasCtx.fillStyle = gradient;
       canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
       x += barWidth + 1;
     }
@@ -160,6 +167,7 @@ class AudioVisualizer extends Component<
         <audio
           src={tracks[currentTrackIndex]}
           ref={this.audioElementRef}
+          onLoadedMetadata={this.setDuration}
           crossOrigin="anonymous"
         ></audio>
         <Card
@@ -169,6 +177,7 @@ class AudioVisualizer extends Component<
         >
           <div>
             <canvas
+              id="myCanvas"
               className="bg-background/60"
               ref={this.canvasElementRef}
               width={this.WIDTH}
@@ -210,6 +219,7 @@ const AudioVisualizerWrapper: React.FC = () => {
   const tracks = useSelector((state: RootState) => state.player.tracks);
   const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
   const dispatch = useDispatch();
+  const { theme } = useTheme();
   const currentTrackIndex = useSelector(
     (state: RootState) => state.player.currentTrackIndex
   );
@@ -219,6 +229,7 @@ const AudioVisualizerWrapper: React.FC = () => {
       currentTrackIndex={currentTrackIndex}
       isPlaying={isPlaying}
       dispatch={dispatch}
+      theme={theme}
     />
   );
 };

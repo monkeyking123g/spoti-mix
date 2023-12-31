@@ -73,7 +73,6 @@ function TrackCard({ data, dispatch }: TrackCardProps) {
       <CardFooter className="flex justify-between ">
         {data.track.preview_url ? (
           <Button
-            className=""
             onClick={() => {
               if (data.track.preview_url) {
                 dispatch(loadTracks([data.track.preview_url]));
@@ -81,6 +80,8 @@ function TrackCard({ data, dispatch }: TrackCardProps) {
             }}
             variant="shadow"
             color="primary"
+            size="md"
+            radius="sm"
           >
             Play
           </Button>

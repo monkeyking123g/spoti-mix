@@ -1,3 +1,4 @@
+"use client";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -21,10 +22,11 @@ import {
   SearchIcon,
   SpotiMixLogo,
 } from "@/components/icons";
-
 import "@/styles/navbar.css";
+import { usePathname, useRouter } from "next/navigation";
 
 export const Navbar = () => {
+  const pathname = usePathname();
   const searchInput = (
     <Input
       aria-label="Search"
@@ -57,7 +59,9 @@ export const Navbar = () => {
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
-                  linkStyles({ color: "foreground" }),
+                  linkStyles({
+                    color: pathname === item.href ? "secondary" : "foreground",
+                  }),
                   "data-[active=true]:text-primary data-[active=true]:font-medium nav-link font-medium p-2"
                 )}
                 color="foreground"
@@ -102,14 +106,8 @@ export const Navbar = () => {
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                    ? "danger"
-                    : "foreground"
-                }
-                href="#"
+                color={pathname === item.href ? "primary" : "foreground"}
+                href={item.href}
                 size="lg"
               >
                 {item.label}

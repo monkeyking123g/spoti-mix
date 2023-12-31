@@ -10,8 +10,9 @@ import {
 } from "@nextui-org/modal";
 import { Input } from "@nextui-org/input";
 import { SearchIcon } from "./icons";
-import { getToken, getSearch, SpotifyTrack } from "@/api";
+import { getToken, getSearch } from "@/api";
 import Track from "./searchTrack";
+import { SpotifyTrack } from "@/api/types";
 
 export default function Search() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
